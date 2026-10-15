@@ -1,0 +1,42 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: infra-capacity-planner
+spec:
+  replicas: 2
+  selector:
+    matchLabels:
+      app: infra-capacity-planner
+  template:
+    metadata:
+      labels:
+        app: infra-capacity-planner
+    spec:
+      containers:
+        - name: api
+          image: ghcr.io/replace-me/infra-capacity-planner:latest
+          ports:
+            - containerPort: 8000
+          readinessProbe:
+            httpGet:
+              path: /health
+              port: 8000
+          resources:
+            requests:
+              cpu: 100m
+              memory: 128Mi
+            limits:
+              cpu: 500m
+              memory: 512Mi
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: infra-capacity-planner
+spec:
+  selector:
+    app: infra-capacity-planner
+  ports:
+    - port: 80
+      targetPort: 8000
+
